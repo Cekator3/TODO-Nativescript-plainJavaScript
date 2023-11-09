@@ -18,51 +18,51 @@ export class TaskNotFoundException {}
  * Creates a new task for the user, filling it with default data.
  * @return {void}
  */
-export function AddNewTask() {}
+export function TaskCreate() {}
 
 /**
  * Returns a list of the user's tasks.
  * @return {Task[]}
  */
-export function GetTasks() {}
+export function TaskGetAll() {}
+
+/**
+ * Checks if task with that identifier exists.
+ * @param {number} taskId Task's identifier.
+ * @return {boolean}
+ */
+export function TaskExist(taskId) {}
 
 /**
  * Returns user's task.
- *
- * If the task with this identifier does not exist, null will be returned.
- * @param {number} id Task's identifier.
- * @return {Task | null}
+ * @param {number} taskId Task's identifier.
+ * @throws {TaskNotFoundException}
+ * @return {Task}
  */
-export function GetTask(id) {}
+export function TaskGet(taskId) {}
 
 /**
  * Deletes user's task.
- *
- * If the task with such identifier does not exist, TaskNotFoundException will be thrown.
- * @param {number} id Task's identifier
+ * @param {number} taskId Task's identifier
  * @throws {TaskNotFoundException}
  * @return {void}
  */
-export function DeleteTask(id) {}
+export function TaskDelete(taskId) {}
 
 /**
  * Changes title of the user's task.
- *
- * If the task with such identifier does not exist, TaskNotFoundException will be thrown.
- * @param id {number} Task's identifier
- * @param newTitle {string} Task's new title.
+ * @param {number} taskId  Task's identifier
+ * @param {string} newTitle Task's new title.
  * @throws {TaskNotFoundException}
  * @return {void}
  */
-export function ChangeTaskTitle(id, newTitle) {}
+export function TaskChangeTitle(taskId, newTitle) {}
 
 /**
  * Changes title of the user's task.
- *
- * If the task with such identifier does not exist, TaskNotFoundException will be thrown.
- * @param id {number} Task's identifier
- * @param newDescription {string} Task's new description.
+ * @param {number} taskId Task's identifier
+ * @param {string} newDescription Task's new description.
  * @throws {TaskNotFoundException}
  * @return {void}
  */
-export function ChangeTaskDescription(id, newDescription) {}
+export function TaskChangeDescription(taskId, newDescription) {}
