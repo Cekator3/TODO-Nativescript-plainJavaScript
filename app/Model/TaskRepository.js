@@ -27,6 +27,8 @@ export class Task
 
 /**
  * Creates a new task for the user, filling it with default data.
+ * @param {string} title Task's title.
+ * @param {string} description Task's description.
  * @throws {DatabaseErrorOccuredException}
  * @return {void}
  */
@@ -84,7 +86,7 @@ export function TaskExist(taskId)
 
 /**
  * Returns user's task if exists.
- * @param {number} taskId TaskRepository's identifier.
+ * @param {number} taskId Task's identifier.
  * @throws {DatabaseErrorOccuredException}
  * @return {Task | null}
  */
@@ -99,14 +101,14 @@ export function TaskGet(taskId)
                 throw new DatabaseErrorOccuredException();
             if (rows.length === 0)
                 return;
-            result = new Task(rows[0][0], rows[0][1], rows[0][2]);
+            result = new Task(rows[0], rows[1], rows[2]);
         });
     return result;
 }
 
 /**
  * Deletes user's task.
- * @param {number} taskId TaskRepository's identifier
+ * @param {number} taskId Task's identifier
  * @throws {TaskNotFoundException}
  * @throws {DatabaseErrorOccuredException}
  * @return {void}
@@ -126,8 +128,8 @@ export function TaskDelete(taskId)
 
 /**
  * Changes title of the user's task.
- * @param {number} taskId  TaskRepository's identifier
- * @param {string} newTitle TaskRepository's new title.
+ * @param {number} taskId  Task's identifier
+ * @param {string} newTitle Task's new title.
  * @throws {TaskNotFoundException}
  * @return {void}
  */
@@ -146,8 +148,8 @@ export function TaskChangeTitle(taskId, newTitle)
 
 /**
  * Changes description of the user's task.
- * @param {number} taskId TaskRepository's identifier
- * @param {string} newDescription TaskRepository's new description.
+ * @param {number} taskId Task's identifier
+ * @param {string} newDescription Task's new description.
  * @throws {TaskNotFoundException}
  * @return {void}
  */

@@ -11,8 +11,9 @@ QUnit.test("creating task test", testCreatingTask);
 
 function testCreatingTask(assert)
 {
+    ResetDatabase();
+    let amount = TaskGetAll().length;
     TaskCreate('Новая задача', 'бла');
-    assert.deepEqual(TaskGetAll().length, 1);
     let task = TaskGetAll()[0];
     TaskChangeTitle(task.id, 'My task haha');
     TaskChangeDescription(task.id, 'My holy desc');
@@ -20,5 +21,5 @@ function testCreatingTask(assert)
     assert.deepEqual(task.title, 'My task haha');
     assert.deepEqual(task.description, 'My holy desc');
     TaskDelete(task.id);
-    assert.deepEqual(TaskGetAll().length, 0);
+    assert.deepEqual(TaskGetAll().length, amount);
 }

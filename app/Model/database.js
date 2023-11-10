@@ -29,17 +29,17 @@ function DatabaseInit(err, db)
         return;
     DATABASE.execSQL(
         'CREATE TABLE Task(' +
-        'id INTEGER PRIMARY KEY AUTOINCREMENT,' +
-        'title TEXT,' +
-        'description TEXT)'
+        'id             INTEGER PRIMARY KEY AUTOINCREMENT,' +
+        'title          TEXT,' +
+        'description    TEXT);'
     );
     DATABASE.execSQL(
         'CREATE TABLE Subtask(' +
-        'id INTEGER PRIMARY KEY AUTOINCREMENT,' +
-        'task_id INTEGER' +
-        'title TEXT,' +
-        'is_completed bool,' +
-        'FOREIGN KEY (task_id) REFERENCES TaskRepository (id))'
+        'id             INTEGER PRIMARY KEY AUTOINCREMENT,' +
+        'task_id        INTEGER,' +
+        'title          TEXT,' +
+        'is_completed   INTEGER DEFAULT 0 CHECK(is_completed IN (0,1)),' +
+        'FOREIGN KEY (task_id) REFERENCES Task (id) ON DELETE CASCADE);'
     );
 }
 
