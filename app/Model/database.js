@@ -25,12 +25,14 @@ function DatabaseInit(err, db)
     if (err)
         throw new CantOpenDatabaseException();
     DATABASE = db;
+    db.execSQL("PRAGMA foreign_keys=ON");
     if (IsDatabaseSchemeReady())
         return;
     DATABASE.execSQL(
         'CREATE TABLE Task(' +
         'id             INTEGER PRIMARY KEY AUTOINCREMENT,' +
         'title          TEXT,' +
+        'is_completed   INTEGER DEFAULT 0 CHECK(is_completed IN (0,1)),' +
         'description    TEXT);'
     );
     DATABASE.execSQL(

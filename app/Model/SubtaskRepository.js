@@ -20,10 +20,7 @@ export class Subtask
         this.id = id;
         this.taskId = taskId;
         this.title = title;
-        if (isCompleted !== 0)
-            this.isCompleted = true;
-        else
-            this.isCompleted = false;
+        this.isCompleted = isCompleted !== 0;
     }
 }
 

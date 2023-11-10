@@ -17,10 +17,12 @@ export class Task
     id;
     title;
     description;
-    constructor(id, title, description)
+    isCompleted;
+    constructor(id, title, isCompleted, description)
     {
         this.id = id;
         this.title = title;
+        this.isCompleted = isCompleted !== 0;
         this.description = description;
     }
 }
@@ -57,7 +59,7 @@ export function TaskGetAll()
         if (err)
             throw new DatabaseErrorOccuredException();
         for (let row of rows)
-            result.push(new Task(row[0], row[1], row[2]));
+            result.push(new Task(row[0], row[1], row[2], row[3]));
     });
     return result;
 }
@@ -101,7 +103,7 @@ export function TaskGet(taskId)
                 throw new DatabaseErrorOccuredException();
             if (rows.length === 0)
                 return;
-            result = new Task(rows[0], rows[1], rows[2]);
+            result = new Task(rows[0], rows[1], rows[2], rows[3]);
         });
     return result;
 }
@@ -159,6 +161,46 @@ export function TaskChangeDescription(taskId, newDescription)
         throw new TaskNotFoundException();
     let db = DatabaseGetInstance();
     db.execSQL('UPDATE Task SET description = "' + newDescription + '" WHERE id = ' + taskId,
+        (err, _) =>
+        {
+            if (err)
+                throw new DatabaseErrorOccuredException();
+        });
+}
+
+/**
+ * Inverts completion status of the task.
+ * @param {number} taskId Task's identifier.
+ * @throws {TaskNotFoundException}
+ * @throws {DatabaseErrorOccuredException}
+ * @return {void}
+ */
+export function TaskInvertStatus(taskId)
+{
+    if (!TaskExist(taskId))
+        throw new TaskNotFoundException();
+    let db = DatabaseGetInstance();
+    db.execSQL('UPDATE Task SET is_completed = ((is_completed | 1) - (is_completed & 1)) WHERE id = ' + taskId,
+        (err, _) =>
+        {
+            if (err)
+                throw new DatabaseErrorOccuredException();
+        });
+}
+
+/**
+ * Completes all subtasks of the task.
+ * @param {number} taskId Task's identifier.
+ * @throws {TaskNotFoundException}
+ * @throws {DatabaseErrorOccuredException}
+ * @return {void}
+ */
+export function TaskCompleteAllSubtasks(taskId)
+{
+    if (!TaskExist(taskId))
+        throw new TaskNotFoundException();
+    let db = DatabaseGetInstance();
+    db.execSQL('UPDATE Subtask SET is_completed = 1 WHERE task_id = ' + taskId,
         (err, _) =>
         {
             if (err)
