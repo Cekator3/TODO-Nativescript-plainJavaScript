@@ -2,7 +2,8 @@
  * @fileoverview subsystem for user interaction with his/her tasks
  * @throws {CantOpenDatabaseException}
  *
- * Ignore all SQL-injections, please.
+ * prepared sql queries are available only in the paid version of
+ * nativescript-sqlite plugin, so, please, ignore SQL-injection moments.
  */
 
 import {DatabaseGetInstance} from "~/Model/database";
@@ -29,10 +30,10 @@ export class Task
  * @throws {DatabaseErrorOccuredException}
  * @return {void}
  */
-export function TaskCreate()
+export function TaskCreate(title, description)
 {
     let db = DatabaseGetInstance();
-    db.execSQL('INSERT INTO Task (title, description) VALUES ("Новая задача", "")',
+    db.execSQL('INSERT INTO Task (title, description) VALUES (\'' + title + '\', \'' + description + '\')',
         (err, _) =>
         {
             if (err)
@@ -69,7 +70,7 @@ export function TaskExist(taskId)
 {
     let result = false;
     let db = DatabaseGetInstance();
-    db.get('SELECT 1 FROM Task WHERE id = ' + taskId + ' LIMIT 1',
+    db.get("SELECT 1 FROM Task WHERE id = '" + taskId + "' LIMIT 1",
         (err, rows) =>
         {
             if (err)
@@ -135,7 +136,7 @@ export function TaskChangeTitle(taskId, newTitle)
     if (!TaskExist(taskId))
         throw new TaskNotFoundException();
     let db = DatabaseGetInstance();
-    db.execSQL('UPDATE Task SET title = "' + newTitle + '" WHERE id = ' + taskId,
+    db.execSQL('UPDATE Task SET title = \'' + newTitle + '\' WHERE id = ' + taskId,
         (err, _) =>
         {
             if (err)
@@ -162,5 +163,3 @@ export function TaskChangeDescription(taskId, newDescription)
                 throw new DatabaseErrorOccuredException();
         });
 }
-
-function PrepareString(){}
