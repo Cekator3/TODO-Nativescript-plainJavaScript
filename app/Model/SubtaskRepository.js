@@ -1,5 +1,5 @@
 /**
- * @fileoverview A subsystem for changing data of task's subtasks.
+ * @fileoverview A subsystem for interaction with stored data of user's subtasks.
  */
 
 import {
@@ -42,8 +42,9 @@ export function SubtaskCreate(taskId, title)
     if (!TaskExist(taskId))
         throw new TaskNotFoundException();
     let db = DatabaseGetInstance();
-    db.execSQL('INSERT INTO Subtask (task_id, title) VALUES (' + taskId + ", '" + title + "')",
-        (err, _) =>
+    let query = 'INSERT INTO Subtask (task_id, title) VALUES (' + taskId + ", '" + title + "')";
+    console.log('SubtaskCreate: ' + query);
+    db.execSQL(query, (err, _) =>
         {
             if (err)
                 throw new DatabaseErrorOccuredException();
@@ -64,8 +65,9 @@ export function SubtaskGetAll(taskId)
         throw new TaskNotFoundException();
     let result = [];
     let db = DatabaseGetInstance();
-    db.all('SELECT * FROM Subtask WHERE task_id = ' + taskId,
-        (err, rows) =>
+    let query = 'SELECT * FROM Subtask WHERE task_id = ' + taskId;
+    console.log('SubtaskGetAll: ' + query);
+    db.all(query, (err, rows) =>
         {
             if (err)
                 throw new DatabaseErrorOccuredException();
@@ -85,8 +87,9 @@ export function SubtaskExist(subtaskId)
 {
     let result = false;
     let db = DatabaseGetInstance();
-    db.get("SELECT 1 FROM Subtask WHERE id = '" + subtaskId + "' LIMIT 1",
-        (err, rows) =>
+    let query = "SELECT 1 FROM Subtask WHERE id = '" + subtaskId + "' LIMIT 1";
+    console.log('SubtaskExist: ' + query);
+    db.get(query, (err, rows) =>
         {
             if (err)
                 throw new DatabaseErrorOccuredException();
@@ -107,8 +110,9 @@ export function SubtaskGet(subtaskId)
 {
     let result = null;
     let db = DatabaseGetInstance();
-    db.get('SELECT * FROM Subtask WHERE id = ' + subtaskId + ' LIMIT 1',
-        (err, rows) =>
+    let query = 'SELECT * FROM Subtask WHERE id = ' + subtaskId + ' LIMIT 1';
+    console.log('SubtaskGet: ' + query);
+    db.get(query, (err, rows) =>
         {
             if (err)
                 throw new DatabaseErrorOccuredException();
@@ -124,12 +128,13 @@ function getTaskIdOfSubtask(subtaskId)
 {
     let result = -1;
     let db = DatabaseGetInstance();
-    db.get("SELECT task_id FROM Subtask WHERE id = " + subtaskId,
-        (err, res) =>
+    let query = "SELECT task_id FROM Subtask WHERE id = " + subtaskId + ' LIMIT 1';
+    console.log('getTaskIdOfSubtask: ' + query);
+    db.get(query, (err, res) =>
         {
             if (err)
                 throw new DatabaseErrorOccuredException();
-            result = res[0];
+            result = res.length !== 0? res[0]: -1;
         });
     return result;
 }
@@ -137,22 +142,23 @@ function getTaskIdOfSubtask(subtaskId)
 /**
  * Deletes subtask.
  * @param {number} subtaskId SubtaskRepository's identifier.
- * @throws {SubtaskNotFoundException}
  * @throws {DatabaseErrorOccuredException}
  * @return {void}
  */
 export function SubtaskDelete(subtaskId)
 {
-    if (!SubtaskExist(subtaskId))
-        throw new SubtaskNotFoundException();
     let taskId = getTaskIdOfSubtask(subtaskId);
     let db = DatabaseGetInstance();
-    db.execSQL('DELETE FROM Subtask WHERE id = ' + subtaskId,
+    let query = 'DELETE FROM Subtask WHERE id = ' + subtaskId + ' LIMIT 1';
+    console.log('SubtaskDelete: ' + query);
+    db.execSQL(query,
         (err, _) =>
         {
             if (err)
                 throw new DatabaseErrorOccuredException();
         });
+    if (taskId === -1)
+        return;
     if (SubtaskIsAllSubtasksCompleted(taskId))
         TaskSetCompletionStatus(taskId, true);
 }
@@ -170,8 +176,9 @@ export function SubtaskChangeTitle(subtaskId, newTitle)
     if (!SubtaskExist(subtaskId))
         throw new SubtaskNotFoundException();
     let db = DatabaseGetInstance();
-    db.execSQL('UPDATE Subtask SET title = \'' + newTitle + '\' WHERE id = ' + subtaskId,
-        (err, _) =>
+    let query = 'UPDATE Subtask SET title = \'' + newTitle + '\' WHERE id = ' + subtaskId + ' LIMIT 1';
+    console.log('SubtaskChangeTitle: ' + query);
+    db.execSQL(query, (err, _) =>
         {
             if (err)
                 throw new DatabaseErrorOccuredException();
@@ -190,12 +197,38 @@ export function SubtaskInvertStatus(subtaskId)
     if (!SubtaskExist(subtaskId))
         throw new SubtaskNotFoundException();
     let db = DatabaseGetInstance();
-    db.execSQL('UPDATE Subtask SET is_completed = ((is_completed | 1) - (is_completed & 1)) WHERE id = ' + subtaskId,
-        (err, _) =>
+    let query = 'UPDATE Subtask SET is_completed = ((is_completed | 1) - (is_completed & 1)) WHERE id = ' + subtaskId;
+    console.log('SubtaskInvertStatus: ' + query);
+    db.execSQL(query, (err, _) =>
         {
             if (err)
                 throw new DatabaseErrorOccuredException();
         });
+    let taskId = getTaskIdOfSubtask(subtaskId);
+    TaskSetCompletionStatus(taskId, SubtaskIsAllSubtasksCompleted(taskId));
+}
+
+/**
+ * Sets completion status of the subtask.
+ * @param {number} taskId Task's identifier.
+ * @param {boolean} status
+ * @throws {SubtaskNotFoundException}
+ * @throws {DatabaseErrorOccuredException}
+ * @return {void}
+ */
+export function SubtaskSetCompletionStatus(subtask, status)
+{
+    let numStatus = status? 1: 0;
+    if (!SubtaskExist(subtaskId))
+        throw new SubtaskNotFoundException();
+    let db = DatabaseGetInstance();
+    let query = 'UPDATE Subtask SET is_completed = '+ numStatus + '  WHERE id = ' + subtaskId;
+    console.log('SubtaskInvertStatus: ' + query);
+    db.execSQL(query, (err, _) =>
+    {
+        if (err)
+            throw new DatabaseErrorOccuredException();
+    });
     let taskId = getTaskIdOfSubtask(subtaskId);
     TaskSetCompletionStatus(taskId, SubtaskIsAllSubtasksCompleted(taskId));
 }
@@ -213,12 +246,12 @@ export function SubtaskIsAllSubtasksCompleted(taskId)
         throw new TaskNotFoundException();
     let result = false;
     let db = DatabaseGetInstance();
-    db.get("SELECT 1 FROM Subtask WHERE (task_id = " + taskId + ") AND (is_completed = 0) LIMIT 1",
-        (err, res) =>
+    let query = "SELECT 1 FROM Subtask WHERE (task_id = " + taskId + ") AND (is_completed = 0) LIMIT 1";
+    console.log('SubtaskIsAllSubtasksCompleted: ' + query);
+    db.get(query, (err, res) =>
         {
             if (err)
                 throw new DatabaseErrorOccuredException();
-            console.log(res);
             result = res === null;
         });
     return result;
