@@ -9,7 +9,6 @@ const SQLITE = require( "nativescript-sqlite" );
 let DATABASE = undefined;
 new SQLITE(DB_NAME, DatabaseInit);
 
-
 function IsDatabaseSchemeReady()
 {
     let result = false;
@@ -20,14 +19,8 @@ function IsDatabaseSchemeReady()
     return result;
 }
 
-function DatabaseInit(err, db)
+function CreateDatabaseScheme()
 {
-    if (err)
-        throw new CantOpenDatabaseException();
-    DATABASE = db;
-    db.execSQL("PRAGMA foreign_keys=ON");
-    if (IsDatabaseSchemeReady())
-        return;
     DATABASE.execSQL(
         'CREATE TABLE Task(' +
         'id             INTEGER PRIMARY KEY AUTOINCREMENT,' +
@@ -45,8 +38,19 @@ function DatabaseInit(err, db)
     );
 }
 
+
+function DatabaseInit(err, db)
+{
+    if (err)
+        throw new CantOpenDatabaseException();
+    DATABASE = db;
+    db.execSQL("PRAGMA foreign_keys=ON");
+    if (!IsDatabaseSchemeReady())
+        CreateDatabaseScheme();
+}
+
 /**
- * Returns instance for interaction with sqlite database.
+ * Returns instance for interaction with SQLite database.
  * @return {SQLITE}
  */
 export function DatabaseGetInstance()
@@ -54,6 +58,10 @@ export function DatabaseGetInstance()
     return DATABASE;
 }
 
+/**
+ * Wipes and completely recreates the SQLite database.
+ * @returns {void}
+ */
 export function ResetDatabase()
 {
     SQLITE.deleteDatabase(DB_NAME);
