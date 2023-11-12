@@ -1,8 +1,13 @@
 /**
- * @fileoverview A subsystem for user interaction with subtasks of a certain task.
+ * @fileoverview A subsystem for changing data of task's subtasks.
  */
 
-import {TaskNotFoundException, SubtaskNotFoundException, DatabaseErrorOccuredException} from "~/Model/Exceptions";
+import {
+    TaskNotFoundException,
+    SubtaskNotFoundException,
+    DatabaseErrorOccuredException,
+    SubtaskTitleLengthMustBeMoreThanZeroException
+} from "~/Model/Exceptions";
 import {DatabaseGetInstance} from "~/Model/database";
 import {Task, TaskExist} from "~/Model/TaskRepository";
 
@@ -172,4 +177,9 @@ export function SubtaskInvertStatus(subtaskId)
             if (err)
                 throw new DatabaseErrorOccuredException();
         });
+}
+
+export function SubtaskIsAllSubtasksCompleted(taskId)
+{
+
 }

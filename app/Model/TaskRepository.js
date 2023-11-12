@@ -1,5 +1,5 @@
 /**
- * @fileoverview subsystem for user interaction with his/her tasks
+ * @fileoverview subsystem for changing user's tasks data.
  * @throws {CantOpenDatabaseException}
  *
  * prepared sql queries are available only in the paid version of
@@ -7,7 +7,11 @@
  */
 
 import {DatabaseGetInstance} from "~/Model/database";
-import {DatabaseErrorOccuredException, TaskNotFoundException} from "~/Model/Exceptions";
+import {
+    DatabaseErrorOccuredException, TaskDescriptionLengthMustBeMoreThanZeroException,
+    TaskNotFoundException,
+    TaskTitleLengthMustBeMoreThanZeroException
+} from "~/Model/Exceptions";
 
 /**
  * Object for storing data of user's task.
@@ -55,6 +59,44 @@ export function TaskGetAll()
     let result = [];
     let db = DatabaseGetInstance();
     db.all('SELECT * FROM Task', (err, rows) =>
+    {
+        if (err)
+            throw new DatabaseErrorOccuredException();
+        for (let row of rows)
+            result.push(new Task(row[0], row[1], row[2], row[3]));
+    });
+    return result;
+}
+
+/**
+ * Returns a list of completed user's tasks.
+ * @throws {DatabaseErrorOccuredException}
+ * @return {Task[]}
+ */
+export function TaskGetCompletedTasks()
+{
+    let result = [];
+    let db = DatabaseGetInstance();
+    db.all('SELECT * FROM Task WHERE is_completed = 1', (err, rows) =>
+    {
+        if (err)
+            throw new DatabaseErrorOccuredException();
+        for (let row of rows)
+            result.push(new Task(row[0], row[1], row[2], row[3]));
+    });
+    return result;
+}
+
+/**
+ * Returns a list of uncompleted user's tasks.
+ * @throws {DatabaseErrorOccuredException}
+ * @return {Task[]}
+ */
+export function TaskGetUncompletedTasks()
+{
+    let result = [];
+    let db = DatabaseGetInstance();
+    db.all('SELECT * FROM Task WHERE is_completed = 0', (err, rows) =>
     {
         if (err)
             throw new DatabaseErrorOccuredException();
@@ -133,6 +175,7 @@ export function TaskDelete(taskId)
  * @param {number} taskId  Task's identifier
  * @param {string} newTitle Task's new title.
  * @throws {TaskNotFoundException}
+ * @throws {DatabaseErrorOccuredException}
  * @return {void}
  */
 export function TaskChangeTitle(taskId, newTitle)
@@ -153,6 +196,7 @@ export function TaskChangeTitle(taskId, newTitle)
  * @param {number} taskId Task's identifier
  * @param {string} newDescription Task's new description.
  * @throws {TaskNotFoundException}
+ * @throws {DatabaseErrorOccuredException}
  * @return {void}
  */
 export function TaskChangeDescription(taskId, newDescription)
@@ -161,6 +205,28 @@ export function TaskChangeDescription(taskId, newDescription)
         throw new TaskNotFoundException();
     let db = DatabaseGetInstance();
     db.execSQL('UPDATE Task SET description = "' + newDescription + '" WHERE id = ' + taskId,
+        (err, _) =>
+        {
+            if (err)
+                throw new DatabaseErrorOccuredException();
+        });
+}
+
+/**
+ * Sets completion status of the task to true.
+ * @param {number} taskId Task's identifier.
+ * @param {boolean} status
+ * @throws {TaskNotFoundException}
+ * @throws {DatabaseErrorOccuredException}
+ * @return {void}
+ */
+export function TaskSetCompletionStatus(taskId, status)
+{
+    let numStatus = status? 1: 0;
+    if (!TaskExist(taskId))
+        throw new TaskNotFoundException();
+    let db = DatabaseGetInstance();
+    db.execSQL("UPDATE Task SET is_completed = " + numStatus + ' WHERE id = ' + taskId,
         (err, _) =>
         {
             if (err)
@@ -201,6 +267,25 @@ export function TaskCompleteAllSubtasks(taskId)
         throw new TaskNotFoundException();
     let db = DatabaseGetInstance();
     db.execSQL('UPDATE Subtask SET is_completed = 1 WHERE task_id = ' + taskId,
+        (err, _) =>
+        {
+            if (err)
+                throw new DatabaseErrorOccuredException();
+        });
+}
+/**
+ * Uncompletes all subtasks of the task.
+ * @param {number} taskId Task's identifier.
+ * @throws {TaskNotFoundException}
+ * @throws {DatabaseErrorOccuredException}
+ * @return {void}
+ */
+export function TaskUncompleteAllSubtasks(taskId)
+{
+    if (!TaskExist(taskId))
+        throw new TaskNotFoundException();
+    let db = DatabaseGetInstance();
+    db.execSQL('UPDATE Subtask SET is_completed = 0 WHERE task_id = ' + taskId,
         (err, _) =>
         {
             if (err)

@@ -1,0 +1,28 @@
+TextField
+{
+    color: white;
+}
+
+.main
+{
+    padding: 0 17%;
+}
+
+.subtaskTitle
+{
+    margin: 15 0;
+    font-size: 30px;
+}
+
+.control-panel
+{
+    flex-flow: column nowrap;
+    justify-content: flex-start;
+}
+
+.deleteSubtask
+{
+    padding: 0;
+    align-self: center;
+    color: red;
+}
