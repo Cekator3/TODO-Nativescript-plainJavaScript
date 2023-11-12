@@ -22,6 +22,7 @@ function saveChangesOfSubtaskCompletionStatus(subtaskId, subtaskCompletionStatus
 {
     try
     {
+        //We are leaving page, so we cannot tell anything to user.
         SubtaskSetCompletionStatus(subtaskId, subtaskCompletionStatus);
     }
     catch (e) {}

@@ -41,8 +41,9 @@ export class Task
 export function TaskCreate(title, description)
 {
     let db = DatabaseGetInstance();
-    db.execSQL('INSERT INTO Task (title, description) VALUES (\'' + title + '\', \'' + description + '\')',
-        (err, _) =>
+    let query = 'INSERT INTO Task (title, description) VALUES (\'' + title + '\', \'' + description + '\')';
+    console.log('TaskCreate: ' + query);
+    db.execSQL(query, (err, _) =>
         {
             if (err)
                 throw new DatabaseErrorOccuredException();
@@ -58,7 +59,9 @@ export function TaskGetAll()
 {
     let result = [];
     let db = DatabaseGetInstance();
-    db.all('SELECT * FROM Task', (err, rows) =>
+    let query = 'SELECT * FROM Task';
+    console.log('TaskGetAll: ' + query);
+    db.all(query, (err, rows) =>
     {
         if (err)
             throw new DatabaseErrorOccuredException();
@@ -77,7 +80,9 @@ export function TaskGetCompletedTasks()
 {
     let result = [];
     let db = DatabaseGetInstance();
-    db.all('SELECT * FROM Task WHERE is_completed = 1', (err, rows) =>
+    let query = 'SELECT * FROM Task WHERE is_completed = 1';
+    console.log('TaskGetCompletedTasks: ' + query);
+    db.all(query, (err, rows) =>
     {
         if (err)
             throw new DatabaseErrorOccuredException();
@@ -96,7 +101,9 @@ export function TaskGetUncompletedTasks()
 {
     let result = [];
     let db = DatabaseGetInstance();
-    db.all('SELECT * FROM Task WHERE is_completed = 0', (err, rows) =>
+    let query = 'SELECT * FROM Task WHERE is_completed = 0';
+    console.log('TaskGetUncompletedTasks: ' + query);
+    db.all(query, (err, rows) =>
     {
         if (err)
             throw new DatabaseErrorOccuredException();
@@ -116,8 +123,9 @@ export function TaskExist(taskId)
 {
     let result = false;
     let db = DatabaseGetInstance();
-    db.get("SELECT 1 FROM Task WHERE id = '" + taskId + "' LIMIT 1",
-        (err, rows) =>
+    let query = "SELECT 1 FROM Task WHERE id = '" + taskId + "' LIMIT 1";
+    console.log('TaskExist: ' + query);
+    db.get(query, (err, rows) =>
         {
             if (err)
                 throw new DatabaseErrorOccuredException();
@@ -138,8 +146,9 @@ export function TaskGet(taskId)
 {
     let result = null;
     let db = DatabaseGetInstance();
-    db.get('SELECT * FROM Task WHERE id = ' + taskId + ' LIMIT 1',
-        (err, rows) =>
+    let query = 'SELECT * FROM Task WHERE id = ' + taskId + ' LIMIT 1';
+    console.log('TaskGet: ' + query);
+    db.get(query, (err, rows) =>
         {
             if (err)
                 throw new DatabaseErrorOccuredException();
@@ -162,8 +171,9 @@ export function TaskDelete(taskId)
     if (!TaskExist(taskId))
         throw new TaskNotFoundException();
     let db = DatabaseGetInstance();
-    db.execSQL('DELETE FROM Task WHERE id = ' + taskId,
-        (err, _) =>
+    let query = 'DELETE FROM Task WHERE id = ' + taskId;
+    console.log('TaskDelete: ' + query);
+    db.execSQL(query, (err, _) =>
         {
             if (err)
                 throw new DatabaseErrorOccuredException();
@@ -183,8 +193,9 @@ export function TaskChangeTitle(taskId, newTitle)
     if (!TaskExist(taskId))
         throw new TaskNotFoundException();
     let db = DatabaseGetInstance();
-    db.execSQL('UPDATE Task SET title = \'' + newTitle + '\' WHERE id = ' + taskId,
-        (err, _) =>
+    let query = 'UPDATE Task SET title = \'' + newTitle + '\' WHERE id = ' + taskId;
+    console.log('TaskChangeTitle: ' + query);
+    db.execSQL(query, (err, _) =>
         {
             if (err)
                 throw new DatabaseErrorOccuredException();
@@ -204,8 +215,9 @@ export function TaskChangeDescription(taskId, newDescription)
     if (!TaskExist(taskId))
         throw new TaskNotFoundException();
     let db = DatabaseGetInstance();
-    db.execSQL('UPDATE Task SET description = "' + newDescription + '" WHERE id = ' + taskId,
-        (err, _) =>
+    let query = 'UPDATE Task SET description = "' + newDescription + '" WHERE id = ' + taskId;
+    console.log('TaskChangeDescription: ' + query);
+    db.execSQL(query, (err, _) =>
         {
             if (err)
                 throw new DatabaseErrorOccuredException();
@@ -226,8 +238,9 @@ export function TaskSetCompletionStatus(taskId, status)
     if (!TaskExist(taskId))
         throw new TaskNotFoundException();
     let db = DatabaseGetInstance();
-    db.execSQL("UPDATE Task SET is_completed = " + numStatus + ' WHERE id = ' + taskId,
-        (err, _) =>
+    let query = "UPDATE Task SET is_completed = " + numStatus + ' WHERE id = ' + taskId;
+    console.log('TaskChangeDescription: ' + query);
+    db.execSQL(query, (err, _) =>
         {
             if (err)
                 throw new DatabaseErrorOccuredException();
@@ -246,8 +259,9 @@ export function TaskInvertStatus(taskId)
     if (!TaskExist(taskId))
         throw new TaskNotFoundException();
     let db = DatabaseGetInstance();
-    db.execSQL('UPDATE Task SET is_completed = ((is_completed | 1) - (is_completed & 1)) WHERE id = ' + taskId,
-        (err, _) =>
+    let query = 'UPDATE Task SET is_completed = ((is_completed | 1) - (is_completed & 1)) WHERE id = ' + taskId;
+    console.log('TaskInvertStatus: ' + query);
+    db.execSQL(query, (err, _) =>
         {
             if (err)
                 throw new DatabaseErrorOccuredException();
@@ -266,8 +280,9 @@ export function TaskCompleteAllSubtasks(taskId)
     if (!TaskExist(taskId))
         throw new TaskNotFoundException();
     let db = DatabaseGetInstance();
-    db.execSQL('UPDATE Subtask SET is_completed = 1 WHERE task_id = ' + taskId,
-        (err, _) =>
+    let query = 'UPDATE Subtask SET is_completed = 1 WHERE task_id = ' + taskId;
+    console.log('TaskCompleteAllSubtasks: ' + query);
+    db.execSQL(query, (err, _) =>
         {
             if (err)
                 throw new DatabaseErrorOccuredException();
@@ -285,8 +300,9 @@ export function TaskUncompleteAllSubtasks(taskId)
     if (!TaskExist(taskId))
         throw new TaskNotFoundException();
     let db = DatabaseGetInstance();
-    db.execSQL('UPDATE Subtask SET is_completed = 0 WHERE task_id = ' + taskId,
-        (err, _) =>
+    let query = 'UPDATE Subtask SET is_completed = 0 WHERE task_id = ' + taskId;
+    console.log('TaskUncompleteAllSubtasks: ' + query);
+    db.execSQL(query, (err, _) =>
         {
             if (err)
                 throw new DatabaseErrorOccuredException();

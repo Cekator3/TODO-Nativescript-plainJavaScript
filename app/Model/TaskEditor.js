@@ -38,9 +38,9 @@ export function TaskEditorGetCurrentlyModifiableTask()
  */
 export function TaskEditorSetCurrentlyModifiableTask(taskId)
 {
-    if (!TaskExist(taskId))
-        throw new TaskNotFoundException();
     currTask = TaskGet(taskId);
+    if (currTask === null)
+        throw new TaskNotFoundException();
 }
 
 /**
