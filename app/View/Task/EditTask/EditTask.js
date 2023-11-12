@@ -1,4 +1,4 @@
-import { createViewModel } from './Subtask-view-model';
+import { createViewModel } from './EditTask-view-model';
 
 export function onNavigatingTo(args) {
     const page = args.object;

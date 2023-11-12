@@ -9,7 +9,7 @@ import {
     TaskEditorSetCurrentlyModifiableTask,
 } from "~/Model/TaskEditor";
 
-const TASK_EDITING_PATH = '/View/Subtask/Subtask';
+const TASK_EDITING_PATH = '/View/Task/EditTask/EditTask';
 const viewModel = new Observable();
 
 function DisplayErrorMessage(message)

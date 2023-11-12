@@ -8,7 +8,7 @@ import {
 } from "~/Model/Exceptions";
 
 
-const TASK_EDITING_PATH = '/View/Subtask/Subtask';
+const TASK_EDITING_PATH = '/View/Task/EditTask/EditTask';
 const TASK_LIST_PATH = '/View/Task/Task';
 const viewModel = new Observable();
 
