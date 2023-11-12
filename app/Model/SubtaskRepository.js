@@ -197,8 +197,7 @@ export function SubtaskInvertStatus(subtaskId)
                 throw new DatabaseErrorOccuredException();
         });
     let taskId = getTaskIdOfSubtask(subtaskId);
-    if (SubtaskIsAllSubtasksCompleted(taskId))
-        TaskSetCompletionStatus(taskId, true);
+    TaskSetCompletionStatus(taskId, SubtaskIsAllSubtasksCompleted(taskId));
 }
 
 /**
