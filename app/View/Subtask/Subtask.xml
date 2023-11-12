@@ -18,8 +18,8 @@
                 <FlexboxLayout class="subtasks">
                     <Label text="Подзадачи" class="subtasks-label"/>
                     <Button text="⊕" class="addNewSubtask" tap="{{ createNewSubtask }}"/>
-                    <StackLayout class="list-of-subtasks">
-                        <ListView items="{{subtasks}}" itemTap="{{ editSubtask }}" separatorColor="transparent">
+                    <StackLayout height="50%">
+                        <ListView height="100%" items="{{subtasks}}" itemTap="{{ editSubtask }}" separatorColor="transparent">
                             <ListView.itemTemplate>
                                 <Label text="{{ title }}" />
                             </ListView.itemTemplate>

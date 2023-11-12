@@ -9,7 +9,7 @@ import {
     SubtaskTitleLengthMustBeMoreThanZeroException
 } from "~/Model/Exceptions";
 import {DatabaseGetInstance} from "~/Model/database";
-import {Task, TaskExist} from "~/Model/TaskRepository";
+import {Task, TaskExist, TaskSetCompletionStatus} from "~/Model/TaskRepository";
 
 /**
  * Object for storing data of task's subtask.
@@ -48,6 +48,7 @@ export function SubtaskCreate(taskId, title)
             if (err)
                 throw new DatabaseErrorOccuredException();
         });
+    TaskSetCompletionStatus(taskId, false);
 }
 
 /**
@@ -118,6 +119,21 @@ export function SubtaskGet(subtaskId)
     return result;
 }
 
+
+function getTaskIdOfSubtask(subtaskId)
+{
+    let result = -1;
+    let db = DatabaseGetInstance();
+    db.get("SELECT task_id FROM Subtask WHERE id = " + subtaskId,
+        (err, res) =>
+        {
+            if (err)
+                throw new DatabaseErrorOccuredException();
+            result = res[0];
+        });
+    return result;
+}
+
 /**
  * Deletes subtask.
  * @param {number} subtaskId SubtaskRepository's identifier.
@@ -129,6 +145,7 @@ export function SubtaskDelete(subtaskId)
 {
     if (!SubtaskExist(subtaskId))
         throw new SubtaskNotFoundException();
+    let taskId = getTaskIdOfSubtask(subtaskId);
     let db = DatabaseGetInstance();
     db.execSQL('DELETE FROM Subtask WHERE id = ' + subtaskId,
         (err, _) =>
@@ -136,6 +153,8 @@ export function SubtaskDelete(subtaskId)
             if (err)
                 throw new DatabaseErrorOccuredException();
         });
+    if (SubtaskIsAllSubtasksCompleted(taskId))
+        TaskSetCompletionStatus(taskId, true);
 }
 
 /**
@@ -177,9 +196,31 @@ export function SubtaskInvertStatus(subtaskId)
             if (err)
                 throw new DatabaseErrorOccuredException();
         });
+    let taskId = getTaskIdOfSubtask(subtaskId);
+    if (SubtaskIsAllSubtasksCompleted(taskId))
+        TaskSetCompletionStatus(taskId, true);
 }
 
+/**
+ * Checks that all subtasks of the user's task have been completed.
+ * @param {number} taskId User's task identifier.
+ * @throws {DatabaseErrorOccuredException}
+ * @throws {TaskNotFoundException}
+ * @return {boolean}
+ */
 export function SubtaskIsAllSubtasksCompleted(taskId)
 {
-
+    if (!TaskExist(taskId))
+        throw new TaskNotFoundException();
+    let result = false;
+    let db = DatabaseGetInstance();
+    db.get("SELECT 1 FROM Subtask WHERE (task_id = " + taskId + ") AND (is_completed = 0) LIMIT 1",
+        (err, res) =>
+        {
+            if (err)
+                throw new DatabaseErrorOccuredException();
+            console.log(res);
+            result = res === null;
+        });
+    return result;
 }

@@ -14,8 +14,8 @@
                     <Button text="□" tap="{{ watchUncompletedTasks }}"/>
                     <Button text="✓" tap="{{ watchCompletedTasks }}"/>
                 </FlexboxLayout>
-                <StackLayout class="tasks">
-                    <ListView items="{{tasks}}" itemTap="{{ editTask }}" separatorColor="transparent">
+                <StackLayout class="tasks" height="90%">
+                    <ListView height="100%" items="{{tasks}}" itemTap="{{ editTask }}" separatorColor="transparent">
                         <ListView.itemTemplate>
                             <Label text="{{ title }}" />
                         </ListView.itemTemplate>

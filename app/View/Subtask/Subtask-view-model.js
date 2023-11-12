@@ -42,7 +42,6 @@ function updateSubtasksListInViewModel()
     if (task === null)
         gotoTasksList();
     viewModel.set('subtasks', SubtaskGetAll(task.id));
-    console.log(viewModel.get('subtasks'))
 }
 
 function updateTaskDetails()

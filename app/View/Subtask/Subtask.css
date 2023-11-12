@@ -36,11 +36,6 @@ TextField
     align-self: center;
 }
 
-.subtasks .list-of-subtasks
-{
-    height: 50%;
-}
-
 .addNewSubtask
 {
     color: hsla(360, 0%, 77%, 1);
