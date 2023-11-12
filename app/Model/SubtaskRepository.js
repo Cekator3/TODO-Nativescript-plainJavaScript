@@ -149,7 +149,7 @@ export function SubtaskDelete(subtaskId)
 {
     let taskId = getTaskIdOfSubtask(subtaskId);
     let db = DatabaseGetInstance();
-    let query = 'DELETE FROM Subtask WHERE id = ' + subtaskId + ' LIMIT 1';
+    let query = 'DELETE FROM Subtask WHERE id = ' + subtaskId;
     console.log('SubtaskDelete: ' + query);
     db.execSQL(query,
         (err, _) =>
@@ -176,7 +176,7 @@ export function SubtaskChangeTitle(subtaskId, newTitle)
     if (!SubtaskExist(subtaskId))
         throw new SubtaskNotFoundException();
     let db = DatabaseGetInstance();
-    let query = 'UPDATE Subtask SET title = \'' + newTitle + '\' WHERE id = ' + subtaskId + ' LIMIT 1';
+    let query = 'UPDATE Subtask SET title = \'' + newTitle + '\' WHERE id = ' + subtaskId;
     console.log('SubtaskChangeTitle: ' + query);
     db.execSQL(query, (err, _) =>
         {
@@ -216,14 +216,14 @@ export function SubtaskInvertStatus(subtaskId)
  * @throws {DatabaseErrorOccuredException}
  * @return {void}
  */
-export function SubtaskSetCompletionStatus(subtask, status)
+export function SubtaskSetCompletionStatus(subtaskId, status)
 {
     let numStatus = status? 1: 0;
     if (!SubtaskExist(subtaskId))
         throw new SubtaskNotFoundException();
     let db = DatabaseGetInstance();
     let query = 'UPDATE Subtask SET is_completed = '+ numStatus + '  WHERE id = ' + subtaskId;
-    console.log('SubtaskInvertStatus: ' + query);
+    console.log('SubtaskSetCompletionStatus: ' + query);
     db.execSQL(query, (err, _) =>
     {
         if (err)

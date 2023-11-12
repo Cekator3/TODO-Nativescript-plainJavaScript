@@ -1,5 +1,5 @@
 import {Dialogs, Frame, Observable} from "@nativescript/core";
-import {SubtaskDelete, SubtaskGet, SubtaskInvertStatus} from "~/Model/SubtaskRepository";
+import {SubtaskDelete, SubtaskGet, SubtaskInvertStatus, SubtaskSetCompletionStatus} from "~/Model/SubtaskRepository";
 import {TaskEditorSetNewTitleForSubtask} from "~/Model/TaskEditor";
 import {
     DatabaseErrorOccuredException,
@@ -22,10 +22,15 @@ function DisplayErrorMessage(message)
     });
 }
 
-function updateSubtaskDetailsInViewModel()
+function updateSubtaskTitleInViewModel()
 {
     let subtask = SubtaskGet(viewModel.get('subtaskId'));
     viewModel.set('subtaskTitle', subtask.title);
+}
+
+function updateSubtaskCompletionStatusInViewModel()
+{
+    let subtask = SubtaskGet(viewModel.get('subtaskId'));
     viewModel.set('subtaskCompletionStatus', subtask.isCompleted);
 }
 
@@ -48,6 +53,7 @@ async function deleteSubtask()
     {
         let id = viewModel.get('subtaskId');
         SubtaskDelete(id);
+        viewModel.set('subtaskHasBeenDeleted', true);
         navigateToTaskEditPage();
     }
     catch (e)
@@ -73,7 +79,7 @@ function reverseCompletionStatusOfSubtask(args)
     {
         let id = viewModel.get('subtaskId');
         SubtaskInvertStatus(id);
-        updateSubtaskDetailsInViewModel();
+        updateSubtaskTitleInViewModel();
     }
     catch (e)
     {
@@ -99,7 +105,7 @@ function setSubtaskTitle(args)
     try
     {
         TaskEditorSetNewTitleForSubtask(subtaskId, title);
-        updateSubtaskDetailsInViewModel();
+        updateSubtaskTitleInViewModel();
     }
     catch (e)
     {
@@ -145,8 +151,10 @@ export function createViewModel(context)
     viewModel.deleteSubtask = deleteSubtask;
     viewModel.reverseCompletionStatusOfSubtask = reverseCompletionStatusOfSubtask;
     viewModel.setSubtaskTitle = setSubtaskTitle;
-    viewModel.gotoTasksList = navigateToTasksList;
-    viewModel.gotoTaskEditPage = navigateToTaskEditPage;
-    updateSubtaskDetailsInViewModel();
+    viewModel.navigateToTasksList = navigateToTasksList;
+    viewModel.navigateToTaskEditPage = navigateToTaskEditPage;
+    viewModel.subtaskHasBeenDeleted = false;
+    updateSubtaskTitleInViewModel();
+    updateSubtaskCompletionStatusInViewModel();
     return viewModel;
 }
