@@ -66,8 +66,25 @@ function editTask(args)
 {
     if (args.object.items !== undefined)
     {
-        let id = +args.object.items[args.index].id;
-        TaskEditorSetCurrentlyModifiableTask(id);
+        let taskId = +args.object.items[args.index].id;
+        try
+        {
+            TaskEditorSetCurrentlyModifiableTask(taskId);
+        }
+        catch (e)
+        {
+            if (e instanceof TaskNotFoundException)
+            {
+                updateTasksListInViewModel();
+                return;
+            }
+            if (e instanceof DatabaseErrorOccuredException)
+            {
+                DisplayErrorMessage('Невозможно взаимодействовать с хранилищем данных на телефоне');
+                return;
+            }
+            throw e;
+        }
     }
     if (TaskEditorGetCurrentlyModifiableTask() === null)
         return;

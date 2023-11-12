@@ -22,7 +22,7 @@ function DisplayErrorMessage(message)
     });
 }
 
-function updateSubtaskInfoInViewModel()
+function updateSubtaskDetailsInViewModel()
 {
     let subtask = SubtaskGet(viewModel.get('subtaskId'));
     viewModel.set('subtaskTitle', subtask.title);
@@ -48,19 +48,19 @@ async function deleteSubtask()
     {
         let id = viewModel.get('subtaskId');
         SubtaskDelete(id);
-        gotoTaskEditPage();
+        navigateToTaskEditPage();
     }
     catch (e)
     {
         if (e instanceof SubtaskNotFoundException)
         {
-            DisplayErrorMessage('Подзадача была удалена');
-            gotoTaskEditPage();
+            DisplayErrorMessage('Подзадача уже была удалена.');
+            navigateToTaskEditPage();
             return;
         }
         if (e instanceof DatabaseErrorOccuredException)
         {
-            DisplayErrorMessage('Невозможно взаимодействовать с хранилищем данных на телефоне');
+            DisplayErrorMessage('Невозможно взаимодействовать с хранилищем данных на телефоне.');
             return;
         }
         throw e;
@@ -73,19 +73,19 @@ function reverseCompletionStatusOfSubtask(args)
     {
         let id = viewModel.get('subtaskId');
         SubtaskInvertStatus(id);
-        updateSubtaskInfoInViewModel();
+        updateSubtaskDetailsInViewModel();
     }
     catch (e)
     {
         if (e instanceof SubtaskNotFoundException)
         {
-            DisplayErrorMessage('Подзадача была удалена');
-            gotoTaskEditPage();
+            DisplayErrorMessage('Подзадача уже была удалена.');
+            navigateToTaskEditPage();
             return;
         }
         if (e instanceof DatabaseErrorOccuredException)
         {
-            DisplayErrorMessage('Невозможно взаимодействовать с хранилищем данных на телефоне');
+            DisplayErrorMessage('Невозможно взаимодействовать с хранилищем данных на телефоне.');
             return;
         }
         throw e;
@@ -94,19 +94,19 @@ function reverseCompletionStatusOfSubtask(args)
 
 function setSubtaskTitle(args)
 {
+    let title = args.object.text;
+    let subtaskId = viewModel.get('subtaskId');
     try
     {
-        let title = args.object.text;
-        let subtaskId = viewModel.get('subtaskId');
         TaskEditorSetNewTitleForSubtask(subtaskId, title);
-        updateSubtaskInfoInViewModel();
+        updateSubtaskDetailsInViewModel();
     }
     catch (e)
     {
         if (e instanceof SubtaskNotFoundException)
         {
             DisplayErrorMessage('Подзадача была удалена');
-            gotoTaskEditPage();
+            navigateToTaskEditPage();
             return;
         }
         if (e instanceof SubtaskTitleLengthMustBeMoreThanZeroException)
@@ -123,7 +123,7 @@ function setSubtaskTitle(args)
     }
 }
 
-function gotoTaskEditPage()
+function navigateToTaskEditPage()
 {
     Frame.topmost().navigate({
         moduleName: TASK_EDITING_PATH,
@@ -131,7 +131,7 @@ function gotoTaskEditPage()
     });
 }
 
-function gotoTasksList()
+function navigateToTasksList()
 {
     Frame.topmost().navigate({
         moduleName: TASK_LIST_PATH,
@@ -145,8 +145,8 @@ export function createViewModel(context)
     viewModel.deleteSubtask = deleteSubtask;
     viewModel.reverseCompletionStatusOfSubtask = reverseCompletionStatusOfSubtask;
     viewModel.setSubtaskTitle = setSubtaskTitle;
-    viewModel.gotoTasksList = gotoTasksList;
-    viewModel.gotoTaskEditPage = gotoTaskEditPage;
-    updateSubtaskInfoInViewModel();
+    viewModel.gotoTasksList = navigateToTasksList;
+    viewModel.gotoTaskEditPage = navigateToTaskEditPage;
+    updateSubtaskDetailsInViewModel();
     return viewModel;
 }

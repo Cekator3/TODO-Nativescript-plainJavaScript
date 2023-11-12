@@ -40,15 +40,33 @@ function updateSubtasksListInViewModel()
 {
     let task = TaskEditorGetCurrentlyModifiableTask();
     if (task === null)
-        gotoTasksList();
-    viewModel.set('subtasks', SubtaskGetAll(task.id));
+        navigateToTasksList();
+    try
+    {
+        viewModel.set('subtasks', SubtaskGetAll(task.id));
+    }
+    catch (e)
+    {
+        if (e instanceof TaskNotFoundException)
+        {
+            DisplayErrorMessage('Редактируемая задача была удалена.');
+            navigateToTasksList();
+            return;
+        }
+        if (e instanceof DatabaseErrorOccuredException)
+        {
+            DisplayErrorMessage('Невозможно взаимодействовать с хранилищем данных на телефоне');
+            return;
+        }
+        throw e;
+    }
 }
 
 function updateTaskDetails()
 {
     let task = TaskEditorGetCurrentlyModifiableTask();
     if (task === null)
-        gotoTasksList();
+        navigateToTasksList();
     viewModel.set('taskTitle', task.title);
     viewModel.set('taskDescription', task.description);
 }
@@ -56,27 +74,27 @@ function updateTaskDetails()
 function setTaskTitle(args)
 {
     let title = args.object.text;
+    if (title.length === 0)
+    {
+        DisplayErrorMessage('Введите название задачи.');
+        return;
+    }
     try
     {
         TaskEditorSetNewTitle(title);
     }
     catch (e)
     {
-        if (e instanceof TaskTitleLengthMustBeMoreThanZeroException)
-        {
-            DisplayErrorMessage('Введите название задачи.');
-            return;
-        }
         if (e instanceof TaskNotFoundException)
         {
             DisplayErrorMessage('Задача была удалена.')
-            gotoTasksList();
+            navigateToTasksList();
             return;
         }
         if (e instanceof TaskEditorNotInitialisedException)
         {
             DisplayErrorMessage('Внутренняя ошибка.');
-            gotoTasksList();
+            navigateToTasksList();
             return;
         }
         if (e instanceof DatabaseErrorOccuredException)
@@ -100,13 +118,13 @@ function setTaskDescription(args)
         if (e instanceof TaskNotFoundException)
         {
             DisplayErrorMessage('Задача была удалена.')
-            gotoTasksList();
+            navigateToTasksList();
             return;
         }
         if (e instanceof TaskEditorNotInitialisedException)
         {
             DisplayErrorMessage('Внутренняя ошибка.');
-            gotoTasksList();
+            navigateToTasksList();
             return;
         }
         if (e instanceof DatabaseErrorOccuredException)
@@ -136,20 +154,20 @@ async function deleteTask()
     try
     {
         TaskEditorDeleteTask();
-        gotoTasksList();
+        navigateToTasksList();
     }
     catch (e)
     {
         if (e instanceof TaskNotFoundException)
         {
             DisplayErrorMessage('Задача уже была удалена');
-            gotoTasksList();
+            navigateToTasksList();
             return;
         }
         if (e instanceof TaskEditorNotInitialisedException)
         {
             DisplayErrorMessage('Внутренняя ошибка');
-            gotoTasksList();
+            navigateToTasksList();
             return;
         }
         if (e instanceof DatabaseErrorOccuredException)
@@ -173,7 +191,7 @@ function createNewSubtask()
         if (e instanceof TaskNotFoundException)
         {
             DisplayErrorMessage('Задача уже была удалена');
-            gotoTasksList();
+            navigateToTasksList();
             return;
         }
         if (e instanceof DatabaseErrorOccuredException)
@@ -188,14 +206,14 @@ function createNewSubtask()
 
 function editSubtask(args)
 {
-    let id = +args.object.items[args.index].id;
+    let subtaskId = +args.object.items[args.index].id;
     Frame.topmost().navigate({
         moduleName: SUBTASK_EDITING_PATH,
-        context: {subtaskId: id}
+        context: {subtaskId: subtaskId}
     });
 }
 
-function gotoTasksList()
+function navigateToTasksList()
 {
     Frame.topmost().navigate({
         moduleName: TASK_LIST_PATH,
@@ -206,12 +224,12 @@ function gotoTasksList()
 export function createViewModel()
 {
     if (TaskEditorGetCurrentlyModifiableTask() === null)
-        gotoTasksList();
+        navigateToTasksList();
     viewModel.setTaskTitle = setTaskTitle;
     viewModel.setTaskDescription = setTaskDescription;
     viewModel.deleteTask = deleteTask;
     viewModel.createNewSubtask = createNewSubtask;
-    viewModel.gotoTasksList = gotoTasksList;
+    viewModel.gotoTasksList = navigateToTasksList;
     viewModel.editSubtask = editSubtask;
     updateTaskDetails();
     updateSubtasksListInViewModel();
