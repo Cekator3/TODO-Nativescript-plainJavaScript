@@ -9,11 +9,13 @@
 
         <StackLayout class="shape-outer-main">
             <FlexboxLayout class="main shape-inner-main">
-                <TextField class="subtaskTitle" hint="Название задачи..." text="{{ taskTitle }}" returnPress="{{ setTaskTitle }}" />
-                <FlexboxLayout class="subtaskDescription">
+                <TextField class="TaskTitle" hint="Название задачи..." text="{{ taskTitle }}" returnPress="{{ setTaskTitle }}" />
+                <FlexboxLayout class="TaskDescription">
                     <TextField width="70%" hint="Описание задачи..." text="{{ taskDescription }}" returnPress="{{ setTaskDescription }}" />
                     <Button text="✕" tap="{{ deleteTask }}"/>
                 </FlexboxLayout>
+
+                <Button tap="{{ completeTask }}" text="{{ taskCompletionText }}" />
 
                 <FlexboxLayout class="subtasks">
                     <Label text="Подзадачи" class="subtasks-label"/>

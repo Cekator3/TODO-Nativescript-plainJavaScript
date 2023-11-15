@@ -12,7 +12,7 @@
                 <TextField class="subtaskTitle" hint="Название подзадачи..." text="{{ subtaskTitle }}" returnPress="{{ setSubtaskTitle }}" />
                 <FlexboxLayout class="control-panel">
                     <FlexboxLayout class="subtaskCompletion">
-                        <Label text="Подзадача выполнена: " />
+                        <Label text="Выполнена: "/>
                         <Switch checked="{{ subtaskCompletionStatus }}" />
                     </FlexboxLayout>
                     <Button class="deleteSubtask" text="Удалить подзадачу" tap="{{ deleteSubtask }}"/>

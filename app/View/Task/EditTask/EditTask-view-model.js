@@ -16,7 +16,7 @@ import {
 import {
     TaskEditorCreateNewSubtask,
     TaskEditorDeleteTask,
-    TaskEditorGetCurrentlyModifiableTask,
+    TaskEditorGetCurrentlyModifiableTask, TaskEditorReverseCompletionStatusOfTask,
     TaskEditorSetNewDescription,
     TaskEditorSetNewTitle,
     TaskEditorSetNewTitleForSubtask
@@ -62,13 +62,18 @@ function updateSubtasksListInViewModel()
     }
 }
 
-function updateTaskDetails()
+function updateTaskDetailsInViewModel()
 {
     let task = TaskEditorGetCurrentlyModifiableTask();
     if (task === null)
         navigateToTasksList();
     viewModel.set('taskTitle', task.title);
     viewModel.set('taskDescription', task.description);
+    viewModel.set('taskCompletionStatus', task.isCompleted);
+    if (task.isCompleted)
+        viewModel.set('taskCompletionText', "Начать задачу заново");
+    else
+        viewModel.set('taskCompletionText', "Выполнить задачу");
 }
 
 function setTaskTitle(args)
@@ -145,6 +150,24 @@ async function askUserIfHeWantsToDeleteTask()
         cancelButtonText: 'Нет',
     });
     return result;
+}
+
+function completeTask()
+{
+    try
+    {
+        TaskEditorReverseCompletionStatusOfTask();
+        updateTaskDetailsInViewModel();
+    }
+    catch (e)
+    {
+        if (e instanceof TaskNotFoundException)
+            console.log('...');
+        if (e instanceof TaskEditorNotInitialisedException)
+            console.log('...');
+        if (e instanceof DatabaseErrorOccuredException)
+            console.log('...');
+    }
 }
 
 async function deleteTask()
@@ -231,7 +254,8 @@ export function createViewModel()
     viewModel.createNewSubtask = createNewSubtask;
     viewModel.gotoTasksList = navigateToTasksList;
     viewModel.editSubtask = editSubtask;
-    updateTaskDetails();
+    viewModel.completeTask = completeTask;
+    updateTaskDetailsInViewModel();
     updateSubtasksListInViewModel();
     return viewModel;
 }

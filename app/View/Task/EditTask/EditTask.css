@@ -8,17 +8,22 @@ TextField
     padding: 0 14%;
 }
 
-.subtaskTitle
+.TaskTitle
 {
     margin: 15 0;
     font-size: 30px;
 }
 
-.subtaskDescription
+.TaskDescription
 {
     flex-flow: row nowrap;
     justify-content: space-between;
-    margin: 0 0 35 0;
+}
+
+.completeTask
+{
+    flex-flow: row nowrap;
+    justify-content: space-between;
 }
 
 .subtaskDescription > TextField

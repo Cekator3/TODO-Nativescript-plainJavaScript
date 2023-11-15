@@ -26,3 +26,15 @@ TextField
     align-self: center;
     color: red;
 }
+
+.subtaskCompletion
+{
+    flex-flow: row nowrap;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.subtaskCompletion Label
+{
+
+}
