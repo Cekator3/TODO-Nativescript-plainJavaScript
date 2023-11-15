@@ -239,7 +239,7 @@ export function TaskSetCompletionStatus(taskId, status)
         throw new TaskNotFoundException();
     let db = DatabaseGetInstance();
     let query = "UPDATE Task SET is_completed = " + numStatus + ' WHERE id = ' + taskId;
-    console.log('TaskChangeDescription: ' + query);
+    console.log('TaskSetCompletionStatus: ' + query);
     db.execSQL(query, (err, _) =>
         {
             if (err)
