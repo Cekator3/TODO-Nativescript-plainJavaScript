@@ -162,11 +162,23 @@ function completeTask()
     catch (e)
     {
         if (e instanceof TaskNotFoundException)
-            console.log('...');
+        {
+            DisplayErrorMessage('Задача была удалена.')
+            navigateToTasksList();
+            return;
+        }
         if (e instanceof TaskEditorNotInitialisedException)
-            console.log('...');
+        {
+            DisplayErrorMessage('Внутренняя ошибка.');
+            navigateToTasksList();
+            return;
+        }
         if (e instanceof DatabaseErrorOccuredException)
-            console.log('...');
+        {
+            DisplayErrorMessage('Невозможно взаимодействовать с хранилищем данных на телефоне');
+            return;
+        }
+        throw e;
     }
 }
 
